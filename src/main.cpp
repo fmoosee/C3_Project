@@ -55,6 +55,20 @@ void drawQRCode(String data) {
     display.display();
 }
 
+// --- ADICIONE ESTAS VARIÁVEIS NO TOPO ---
+unsigned long displayTimer = 0;
+const long displayTimeout = 60000; // 60 segundos
+bool displayOn = true;
+#define BAT_PIN 0 // Pino onde o divisor de tensão está ligado
+
+// --- FUNÇÃO PARA LER BATERIA ---
+float getBatteryVoltage() {
+    int raw = analogRead(BAT_PIN);
+    // 3.1V é a ref do ADC do ESP32, 2.0 é o fator do divisor 10k/10k
+    float voltage = (raw / 4095.0) * 3.1 * 2.0; 
+    return map(voltage * 100, 300, 420, 0, 100) / 100.0; // Retorna em Volts
+}
+
 String listGames() {
   String html = "<!DOCTYPE html><html lang='pt-br'><head>";
   html += "<meta charset='UTF-8'>";
@@ -115,7 +129,7 @@ String listGames() {
   }
 
   html += "</div>";
-  html += "<div class='footer pulse'>Sistema Online - 192.168.0.33</div>";
+html += "<div class='footer pulse'>Sistema Online - 192.168.0.33 | Bateria: " + String(getBatteryVoltage(), 1) + "V</div>";
   html += "</body></html>";
   return html;
 }
